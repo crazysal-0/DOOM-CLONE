@@ -1,24 +1,2 @@
-BasedOnStyle: LLVM
-
+BasedOnStyle: Google
 IndentWidth: 8
-TabWidth: 4
-UseTab: Never
-
-ColumnLimit: 100
-
-BreakBeforeBraces: Attach
-
-AllowShortFunctionsOnASingleLine: Empty
-AllowShortIfStatementsOnASingleLine: Never
-AllowShortLoopsOnASingleLine: Never
-
-PointerAlignment: Left
-
-SpaceBeforeParens: ControlStatements
-
-DerivePointerAlignment: false
-
-IncludeBlocks: Regroup
-SortIncludes: CaseSensitive
-
-IndentCaseLabels: true

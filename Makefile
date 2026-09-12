@@ -19,6 +19,9 @@ obj/%.o: src/%.c
 run: $(TARGET)
 	./$(TARGET)
 
+format:
+	clang-format -i src/*.c inc/*.h
+
 clean:
 	rm -rf obj
 	rm -f $(TARGET)
