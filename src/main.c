@@ -3,15 +3,24 @@
 #include "constants.h"
 #include "level.h"
 #include "player.h"
+#include "renderer.h"
 
 int main(void) {
         // Init
         InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_LABEL);
+        ToggleFullscreen();
+        DisableCursor();
 
-        Player player = player_make(PLAYER_STARTING_POSITION, PLAYER_SIZE,
-                                    PLAYER_SPEED, PLAYER_COLOR);
+        RenderTexture2D target = LoadRenderTexture(WINDOW_WIDTH, WINDOW_HEIGHT);
+
+        Player player =
+            player_make(PLAYER_STARTING_POSITION, PLAYER_SIZE, PLAYER_SPEED,
+                        PLAYER_TURN_SPEED, PLAYER_COLOR);
+
         Level level = level_load("res/test.dat");
+
         if (!level.tiles) {
+                UnloadRenderTexture(target);
                 CloseWindow();
                 return 1;
         }
@@ -22,18 +31,34 @@ int main(void) {
 
                 player_update(&player, &level, delta);
 
-                // Draw
+                // Draw game at fixed resolution
+                BeginTextureMode(target);
+
+                ClearBackground(BLACK);
+
+                renderer_draw(&level, &player);
+                player_draw(&player);
+                level_draw(&level);
+
+                EndTextureMode();
+
+                // Draw stretched to fullscreen
                 BeginDrawing();
 
                 ClearBackground(BLACK);
 
-                level_draw(&level);
-                player_draw(&player);
+                DrawTexturePro(
+                    target.texture,
+                    (Rectangle){0, 0, WINDOW_WIDTH, -WINDOW_HEIGHT},
+                    (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()},
+                    (Vector2){0, 0}, 0.0f, WHITE);
 
                 EndDrawing();
         }
 
+        level_free(&level);
+        UnloadRenderTexture(target);
         CloseWindow();
 
         return 0;
-}  //
+}

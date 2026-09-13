@@ -5,56 +5,96 @@
 #include "constants.h"
 #include "level.h"
 
-static bool player_can_move(const Level* level, float x, float y) {
-        float right = x + PLAYER_SIZE - 1;
-        float bottom = y + PLAYER_SIZE - 1;
+static bool player_can_move(const Level* pLevel, const Player* pPlayer, float x,
+                            float y) {
+        float radius = pPlayer->size;
 
-        return level_get_tile(level, x, y) == 0 &&
-               level_get_tile(level, right, y) == 0 &&
-               level_get_tile(level, x, bottom) == 0 &&
-               level_get_tile(level, right, bottom) == 0;
+        int min_x = (int)floorf((x - radius) / GRID_SIZE);
+        int max_x = (int)floorf((x + radius) / GRID_SIZE);
+        int min_y = (int)floorf((y - radius) / GRID_SIZE);
+        int max_y = (int)floorf((y + radius) / GRID_SIZE);
+
+        for (int tile_y = min_y; tile_y <= max_y; ++tile_y) {
+                for (int tile_x = min_x; tile_x <= max_x; ++tile_x) {
+                        if (tile_x < 0 || tile_x >= pLevel->width ||
+                            tile_y < 0 || tile_y >= pLevel->height)
+                                return false;
+
+                        if (pLevel->tiles[tile_y * pLevel->width + tile_x] != 1)
+                                continue;
+
+                        float wall_left = tile_x * GRID_SIZE;
+                        float wall_right = wall_left + GRID_SIZE;
+                        float wall_top = tile_y * GRID_SIZE;
+                        float wall_bottom = wall_top + GRID_SIZE;
+
+                        float closest_x =
+                            fmaxf(wall_left, fminf(x, wall_right));
+                        float closest_y =
+                            fmaxf(wall_top, fminf(y, wall_bottom));
+
+                        float dx = x - closest_x;
+                        float dy = y - closest_y;
+
+                        if (dx * dx + dy * dy < radius * radius) return false;
+                }
+        }
+
+        return true;
 }
 
-Player player_make(Vector2 position, int size, float speed, Color color) {
+Player player_make(Vector2 position, int size, float speed, float turn_speed,
+                   Color color) {
         return (Player){
             .position = position,
             .size = size,
             .speed = speed,
+            .turn_speed = turn_speed,
             .color = color,
         };
 }
 
 void player_draw(Player* pPlayer) {
-        DrawRectangle(pPlayer->position.x, pPlayer->position.y, pPlayer->size,
-                      pPlayer->size, pPlayer->color);
+        DrawCircle(pPlayer->position.x, pPlayer->position.y, pPlayer->size,
+                   pPlayer->color);
 }
 
 void player_update(Player* pPlayer, const Level* pLevel, float delta) {
-        if (IsKeyDown(KEY_W)) {
-                float next_y = pPlayer->position.y - pPlayer->speed * delta;
+        pPlayer->direction += GetMouseDelta().x * 0.003f;
 
-                if (player_can_move(pLevel, pPlayer->position.x, next_y))
-                        pPlayer->position.y = next_y;
+        float move_x = 0.0f;
+        float move_y = 0.0f;
+
+        if (IsKeyDown(KEY_W)) {
+                move_x += sinf(pPlayer->direction);
+                move_y -= cosf(pPlayer->direction);
         }
 
         if (IsKeyDown(KEY_S)) {
-                float next_y = pPlayer->position.y + pPlayer->speed * delta;
-
-                if (player_can_move(pLevel, pPlayer->position.x, next_y))
-                        pPlayer->position.y = next_y;
+                move_x -= sinf(pPlayer->direction);
+                move_y += cosf(pPlayer->direction);
         }
 
         if (IsKeyDown(KEY_A)) {
-                float next_x = pPlayer->position.x - pPlayer->speed * delta;
-
-                if (player_can_move(pLevel, next_x, pPlayer->position.y))
-                        pPlayer->position.x = next_x;
+                move_x -= cosf(pPlayer->direction);
+                move_y -= sinf(pPlayer->direction);
         }
 
         if (IsKeyDown(KEY_D)) {
-                float next_x = pPlayer->position.x + pPlayer->speed * delta;
+                move_x += cosf(pPlayer->direction);
+                move_y += sinf(pPlayer->direction);
+        }
 
-                if (player_can_move(pLevel, next_x, pPlayer->position.y))
+        if (move_x != 0.0f || move_y != 0.0f) {
+                float next_x =
+                    pPlayer->position.x + move_x * pPlayer->speed * delta;
+
+                float next_y =
+                    pPlayer->position.y + move_y * pPlayer->speed * delta;
+
+                if (player_can_move(pLevel, pPlayer, next_x, next_y)) {
                         pPlayer->position.x = next_x;
+                        pPlayer->position.y = next_y;
+                }
         }
 }

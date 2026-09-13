@@ -65,6 +65,28 @@ void level_draw(Level* level) {
                         }
                 }
         }
+
+        for (int x = 0; x <= level->width; ++x) {
+                DrawLine(x * GRID_SIZE, 0, x * GRID_SIZE,
+                         level->height * GRID_SIZE, DARKGRAY);
+        }
+
+        for (int y = 0; y <= level->height; ++y) {
+                DrawLine(0, y * GRID_SIZE, level->width * GRID_SIZE,
+                         y * GRID_SIZE, DARKGRAY);
+        }
+}
+
+void level_draw_grid(const Level* level) {
+        for (int x = 0; x <= level->width; ++x) {
+                DrawLine(x * GRID_SIZE, 0, x * GRID_SIZE,
+                         level->height * GRID_SIZE, DARKGRAY);
+        }
+
+        for (int y = 0; y <= level->height; ++y) {
+                DrawLine(0, y * GRID_SIZE, level->width * GRID_SIZE,
+                         y * GRID_SIZE, DARKGRAY);
+        }
 }
 
 uint8_t level_get_tile(const Level* level, float x, float y) {
