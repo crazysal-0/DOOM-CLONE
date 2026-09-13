@@ -39,7 +39,10 @@ void renderer_draw(const Level* level, const Player* player) {
 
                 float distance = shoot_ray(level, player, ray_direction);
 
-                float wall_height = 10000.0f / distance;
+                float corrected_distance =
+                    distance * cosf(ray_direction - player->direction);
+
+                float wall_height = 10000.0f / corrected_distance;
 
                 float screen_x = (float)i / (ray_count - 1) * WINDOW_WIDTH;
 
