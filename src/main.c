@@ -6,8 +6,9 @@
 #include "renderer.h"
 
 int main(void) {
-        // Init
         InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_LABEL);
+        SetTargetFPS(60);
+
         ToggleFullscreen();
         DisableCursor();
 
@@ -26,32 +27,40 @@ int main(void) {
         }
 
         while (!WindowShouldClose()) {
-                // Update
                 float delta = GetFrameTime();
 
                 player_update(&player, &level, delta);
 
-                // Draw game at fixed resolution
                 BeginTextureMode(target);
 
                 ClearBackground(BLACK);
 
                 renderer_draw(&level, &player);
-                player_draw(&player);
-                level_draw(&level);
 
                 EndTextureMode();
 
-                // Draw stretched to fullscreen
                 BeginDrawing();
 
                 ClearBackground(BLACK);
 
-                DrawTexturePro(
-                    target.texture,
-                    (Rectangle){0, 0, WINDOW_WIDTH, -WINDOW_HEIGHT},
-                    (Rectangle){0, 0, GetScreenWidth(), GetScreenHeight()},
-                    (Vector2){0, 0}, 0.0f, WHITE);
+                DrawTexturePro(target.texture,
+                               (Rectangle){
+                                   0,
+                                   0,
+                                   WINDOW_WIDTH,
+                                   -WINDOW_HEIGHT,
+                               },
+                               (Rectangle){
+                                   0,
+                                   0,
+                                   GetScreenWidth(),
+                                   GetScreenHeight(),
+                               },
+                               (Vector2){
+                                   0,
+                                   0,
+                               },
+                               0.0f, WHITE);
 
                 EndDrawing();
         }

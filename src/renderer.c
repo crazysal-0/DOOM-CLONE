@@ -50,6 +50,6 @@ void renderer_draw(const Level* level, const Player* player) {
 
                 DrawRectangle(screen_x, screen_y,
                               WINDOW_WIDTH / (float)ray_count + 1.0f,
-                              wall_height, WHITE);
+                              wall_height, WALL_COLOR);
         }
 }
