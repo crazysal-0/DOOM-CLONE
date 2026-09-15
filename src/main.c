@@ -36,7 +36,6 @@ int main(void) {
                 ClearBackground(BLACK);
 
                 renderer_draw(&level, &player);
-
                 EndTextureMode();
 
                 BeginDrawing();

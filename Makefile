@@ -1,12 +1,14 @@
 CC = gcc
 
-CFLAGS = -std=c11 -Wall -Wextra -Iinc
+CFLAGS = -std=c11 -Wall -Wextra -O$(OPT) -Iinc
 LDFLAGS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
 TARGET = bin/fps
 
 SRC = $(wildcard src/*.c)
 OBJ = $(SRC:src/%.c=obj/%.o)
+
+OPT ?= 3
 
 $(TARGET): $(OBJ)
 	@mkdir -p $(dir $@)
